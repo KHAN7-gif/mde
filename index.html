@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>KSKK Homestay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* ── RESET & BASE ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f5f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-wrapper {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 860px;
+            background: #f5f7fb;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 20px 80px;
+            scroll-behavior: smooth;
+        }
+        .app-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .app-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .app-content::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 8px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 16px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .app-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+        .app-name span {
+            color: #2563eb;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-right .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+        .notif-badge {
+            position: relative;
+            cursor: pointer;
+            color: #64748b;
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+        .notif-badge:hover {
+            color: #2563eb;
+        }
+        .notif-badge .dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #f5f7fb;
+        }
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .menu-btn:hover {
+            color: #0f172a;
+        }
+
+        /* ── GREETING ── */
+        .greeting {
+            margin-bottom: 16px;
+        }
+        .greeting h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+        .greeting h2 span {
+            color: #2563eb;
+        }
+        .greeting p {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        /* ── SEARCH BAR ── */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 12px 18px;
+            gap: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e9edf4;
+            margin-bottom: 20px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-bar:focus-within {
+            border-color: #2563eb;
+            box-shadow: 0 2px 16px rgba(37, 99, 235, 0.10);
+        }
+        .search-bar i {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 15px;
+            color: #0f172a;
+            font-weight: 450;
+        }
+        .search-bar input::placeholder {
+            color: #94a3b8;
+        }
+        .search-bar .filter-btn {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .search-bar .filter-btn:hover {
+            background: #e2e8f0;
+        }
+
+        /* ── PROMO CAROUSEL ── */
+        .promo-carousel {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            scroll-snap-type: x mandatory;
+            margin-bottom: 6px;
+            scrollbar-width: none;
+        }
+        .promo-carousel::-webkit-scrollbar {
+            display: none;
+        }
+        .promo-card {
+            flex: 0 0 80%;
+            scroll-snap-align: start;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 18px;
+            padding: 16px 20px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #334155;
+            min-height: 80px;
+        }
+        .promo-card .promo-text h4 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+        .promo-card .promo-text p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .promo-card .promo-cta {
+            background: #2563eb;
+            border: none;
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .promo-card .promo-cta:hover {
+            background: #3b82f6;
+            transform: scale(1.03);
+        }
+        .promo-card:nth-child(2) {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        }
+        .promo-card:nth-child(3) {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 14px;
+        }
+        .section-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+        .section-header a {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .section-header a:hover {
+            opacity: 0.7;
+        }
+
+        /* ── PROPERTY CARDS ── */
+        .property-card {
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e9edf4;
+            margin-bottom: 18px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .property-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+        }
+        .property-image {
+            position: relative;
+            height: 170px;
+            background: linear-gradient(135deg, #dbeafe, #ede9fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .property-image .badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: #0f172a;
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .property-image .badge.popular {
+            background: #2563eb;
+        }
+        .property-image .badge.new {
+            background: #059669;
+        }
+        .property-image .image-placeholder {
+            font-size: 64px;
+            opacity: 0.25;
+            color: #2563eb;
+        }
+        .property-image .fav-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(255, 255, 255, 0.92);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .property-image .fav-btn:hover {
+            color: #ef4444;
+            transform: scale(1.05);
+        }
+        .property-image .fav-btn.saved {
+            color: #ef4444;
+        }
+        .property-details {
+            padding: 16px 18px 18px;
+        }
+        .property-details .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
+        .property-details .title-row h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+        .property-details .title-row .rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 2px 10px 2px 8px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .property-details .title-row .rating i {
+            color: #f59e0b;
+            font-size: 12px;
+        }
+        .property-details .location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #64748b;
+            font-size: 13px;
+            margin: 2px 0 10px;
+        }
+        .property-details .location i {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .property-details .features {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .property-details .features span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #475569;
+            background: #f8fafc;
+            padding: 2px 12px 2px 8px;
+            border-radius: 14px;
+        }
+        .property-details .features span i {
+            color: #2563eb;
+            font-size: 13px;
+        }
+
+        /* ── MORE BUTTON & DESCRIPTION ── */
+        .more-section {
+            margin: 4px 0 12px;
+        }
+        .more-btn {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 0;
+            transition: color 0.2s;
+        }
+        .more-btn:hover {
+            color: #1d4ed8;
+        }
+        .more-btn i {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+        .more-btn .fa-chevron-down {
+            transform: rotate(0deg);
+        }
+        .more-btn.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        .extra-desc {
+            display: none;
+            background: #f8fafc;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #334155;
+            margin-top: 8px;
+            border-left: 3px solid #2563eb;
+            animation: fadeUp 0.25s ease;
+        }
+        .extra-desc.show {
+            display: block;
+        }
+        .extra-desc p {
+            margin-bottom: 6px;
+        }
+        .extra-desc strong {
+            color: #0f172a;
+        }
+
+        /* ── IMAGE SLIDER INSIDE MORE ── */
+        .image-slider {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 8px 0 12px;
+            background: #e2e8f0;
+            height: 140px;
+        }
+        .image-slider .slider-track {
+            display: flex;
+            transition: transform 0.4s ease;
+            height: 100%;
+        }
+        .image-slider .slider-track .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #fff;
+            font-weight: 600;
+            background: linear-gradient(135deg, #93c5fd, #60a5fa);
+            flex-shrink: 0;
+        }
+        .image-slider .slider-track .slide:nth-child(2) {
+            background: linear-gradient(135deg, #6ee7b7, #34d399);
+        }
+        .image-slider .slider-track .slide:nth-child(3) {
+            background: linear-gradient(135deg, #fca5a5, #f87171);
+        }
+        .image-slider .slider-track .slide:nth-child(4) {
+            background: linear-gradient(135deg, #c4b5fd, #a78bfa);
+        }
+        .image-slider .slider-track .slide .slide-content {
+            text-align: center;
+            padding: 12px;
+        }
+        .image-slider .slider-track .slide .slide-content i {
+            font-size: 48px;
+            margin-bottom: 6px;
+            display: block;
+            opacity: 0.8;
+        }
+        .image-slider .slider-track .slide .slide-content span {
+            font-size: 14px;
+            font-weight: 500;
+            display: block;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #0f172a;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+        .slider-btn:hover {
+            background: #ffffff;
+        }
+        .slider-btn.prev {
+            left: 6px;
+        }
+        .slider-btn.next {
+            right: 6px;
+        }
+        .slider-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin: 6px 0 8px;
+        }
+        .slider-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .slider-dots .dot.active {
+            background: #2563eb;
+            transform: scale(1.2);
+        }
+
+        .extra-desc .amenities-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 12px;
+            margin: 6px 0 8px;
+        }
+        .extra-desc .amenities-grid span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #1e293b;
+        }
+        .extra-desc .amenities-grid span i {
+            color: #2563eb;
+            font-size: 13px;
+            width: 16px;
+        }
+        .extra-desc .quick-facts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            margin: 6px 0 8px;
+            font-size: 13px;
+        }
+        .extra-desc .quick-facts span {
+            background: #eef2ff;
+            padding: 2px 12px;
+            border-radius: 16px;
+            color: #1e293b;
+        }
+        .extra-desc .quick-facts span i {
+            margin-right: 4px;
+            color: #2563eb;
+        }
+        .extra-desc .lang-list {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 4px 0 6px;
+        }
+        .extra-desc .lang-list span {
+            background: #fff;
+            padding: 2px 12px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+        .extra-desc .policy-text {
+            font-size: 13px;
+            color: #475569;
+            margin-top: 4px;
+        }
+        .extra-desc .contact-link {
+            display: inline-block;
+            margin-top: 8px;
+            color: #2563eb;
+            font-weight: 500;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .extra-desc .contact-link i {
+            margin-right: 4px;
+        }
+
+        .property-details .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 14px;
+            margin-top: 2px;
+        }
+        .property-details .price-row .price {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+        .property-details .price-row .price small {
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+        }
+        .property-details .price-row .book-btn {
+            background: #0f172a;
+            border: none;
+            color: #fff;
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .property-details .price-row .book-btn:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .property-details .price-row .book-btn:active {
+            transform: scale(0.96);
+        }
+        .property-details .price-row .book-btn i {
+            font-size: 14px;
+        }
+
+        /* ── BOTTOM NAV ── */
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0 12px;
+            border-radius: 0 0 32px 32px;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.92);
+            flex-shrink: 0;
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            padding: 2px 12px;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            position: relative;
+        }
+        .bottom-nav .nav-item i {
+            font-size: 22px;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+        .bottom-nav .nav-item span {
+            font-size: 10px;
+            font-weight: 500;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+        .bottom-nav .nav-item.active i,
+        .bottom-nav .nav-item.active span {
+            color: #0f172a;
+        }
+        .bottom-nav .nav-item .nav-badge {
+            position: absolute;
+            top: -2px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0f172a;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.35s ease;
+            pointer-events: none;
+            z-index: 999;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.20);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .toast i {
+            margin-right: 8px;
+            color: #34d399;
+        }
+
+        /* ── CALENDAR PAGE ── */
+        .page {
+            display: none;
+            padding: 0 0 20px;
+        }
+        .page.active {
+            display: block;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 20px;
+        }
+        .calendar-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .calendar-nav {
+            display: flex;
+            gap: 12px;
+        }
+        .calendar-nav button {
+            background: #fff;
+            border: 1px solid #e9edf4;
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #0f172a;
+        }
+        .calendar-nav button:hover {
+            background: #f1f5f9;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            background: #fff;
+            padding: 16px 12px;
+            border-radius: 20px;
+            border: 1px solid #e9edf4;
+        }
+        .calendar-grid .day-name {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            padding: 6px 0;
+        }
+        .calendar-grid .day {
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #0f172a;
+            background: transparent;
+            transition: background 0.2s;
+            cursor: default;
+        }
+        .calendar-grid .day.available {
+            background: #bbf7d0;
+            color: #166534;
+        }
+        .calendar-grid .day.booked {
+            background: #fecaca;
+            color: #991b1b;
+        }
+        .calendar-grid .day.other-month {
+            color: #d1d5db;
+        }
+        .calendar-legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 16px 0 8px;
+            font-size: 13px;
+            color: #475569;
+        }
+        .calendar-legend span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .calendar-legend .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+        .dot.green {
+            background: #bbf7d0;
+        }
+        .dot.red {
+            background: #fecaca;
+        }
+
+        /* ── ABOUT MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 28px;
+            max-width: 380px;
+            width: 100%;
+            padding: 24px 24px 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            animation: fadeUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-box .modal-header h4 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .modal-box .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-box .modal-header .close-btn:hover {
+            color: #0f172a;
+        }
+        .modal-box .modal-body {
+            font-size: 15px;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .modal-box .modal-body p {
+            margin-bottom: 10px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 420px) {
+            .app-wrapper {
+                border-radius: 0;
+                max-height: none;
+                height: 100vh;
+            }
+            .bottom-nav {
+                border-radius: 0;
+            }
+            .app-content {
+                padding: 16px 16px 80px;
+            }
+            .property-image {
+                height: 150px;
+            }
+            .promo-card {
+                flex: 0 0 75%;
+            }
+            .extra-desc .amenities-grid {
+                grid-template-columns: 1fr;
+            }
+            .image-slider {
+                height: 120px;
+            }
+        }
+        @media (min-width: 421px) {
+            .app-wrapper {
+                margin: 16px;
+            }
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .property-card {
+            animation: fadeUp 0.5s ease forwards;
+        }
+        .property-card:nth-child(2) {
+            animation-delay: 0.08s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+
+        <!-- ====== SCROLLABLE CONTENT ====== -->
+        <div class="app-content" id="appContent">
+
+            <!-- HEADER -->
+            <div class="header">
+                <div class="header-left">
+                    <div class="app-icon">K</div>
+                    <div class="app-name">KSKK <span>Homestay</span></div>
+                </div>
+                <div class="header-right">
+                    <button class="menu-btn" id="menuBtn" aria-label="Menu"><i class="fas fa-ellipsis-v"></i></button>
+                    <div class="notif-badge">
+                        <i class="far fa-bell"></i>
+                        <span class="dot"></span>
+                    </div>
+                    <div class="avatar">A</div>
+                </div>
+            </div>
+
+            <!-- ===== HOME PAGE ===== -->
+            <div class="page active" id="homePage">
+                <!-- GREETING -->
+                <div class="greeting">
+                    <h2>Hi, <span>Guest</span> 👋</h2>
+                    <p>Find your perfect homestay in Labuan</p>
+                </div>
+
+                <!-- SEARCH -->
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search homestay, location.." id="searchInput" />
+                    <button class="filter-btn" id="filterBtn">
+                        <i class="fas fa-sliders-h"></i> Filter
+                    </button>
+                </div>
+
+                <!-- PROMO CAROUSEL -->
+                <div class="promo-carousel">
+                    <div class="promo-card">
+                        <div class="promo-text">
+                            <h4>🏖️ 20% OFF</h4>
+                            <p>Book 3+ nights &amp; enjoy discount</p>
+                        </div>
+                        <button class="promo-cta" data-promo="1">Get Offer</button>
+                    </div>
+                    <div class="promo-card">
+                        <div class="promo-text">
+                            <h4>🎉 Early Bird</h4>
+                            <p>Book 7 days ahead &amp; get 15% off</p>
+                        </div>
+                        <button class="promo-cta" data-promo="2">Claim</button>
+                    </div>
+                    <div class="promo-card">
+                        <div class="promo-text">
+                            <h4>🏡 Stay 4, Pay 3</h4>
+                            <p>Free night for 4+ nights booking</p>
+                        </div>
+                        <button class="promo-cta" data-promo="3">Grab Deal</button>
+                    </div>
+                </div>
+
+                <!-- TOP PROPERTIES -->
+                <div class="section-header">
+                    <h3>Top Homestays</h3>
+                    <a href="#" id="seeAllLink">See all →</a>
+                </div>
+
+                <!-- ===== PROPERTY 1 ===== -->
+                <div class="property-card" data-category="beach" data-name="Rumah Pantai">
+                    <div class="property-image" style="background: linear-gradient(135deg, #bfdbfe, #93c5fd);">
+                        <span class="badge popular">⭐ Popular</span>
+                        <button class="fav-btn" data-id="1"><i class="far fa-heart"></i></button>
+                        <div class="image-placeholder"><i class="fas fa-umbrella-beach"></i></div>
+                    </div>
+                    <div class="property-details">
+                        <div class="title-row">
+                            <h4>Rumah Pantai Homestay</h4>
+                            <div class="rating"><i class="fas fa-star"></i> 4.9</div>
+                        </div>
+                        <div class="location">
+                            <i class="fas fa-map-pin"></i> Jalan Tanjung Purun, WP Labuan
+                        </div>
+                        <div class="features">
+                            <span><i class="fas fa-bed"></i> 3 Bed</span>
+                            <span><i class="fas fa-bath"></i> 2 Bath</span>
+                            <span><i class="fas fa-user-friends"></i> 6 Guests</span>
+                        </div>
+
+                        <!-- MORE SECTION with Image Slider -->
+                        <div class="more-section">
+                            <button class="more-btn" data-target="desc1">
+                                <i class="fas fa-chevron-down"></i> More
+                            </button>
+                            <div id="desc1" class="extra-desc">
+                                <!-- IMAGE SLIDER -->
+                                <div class="image-slider" data-slider="1">
+                                    <div class="slider-track" id="sliderTrack1">
+                                        <div class="slide"><div class="slide-content"><i class="fas fa-umbrella-beach"></i><span>Pantai Depan</span></div></div>
+                                        <div class="slide"><div class="slide-content"><i class="fas fa-swimming-pool"></i><span>Kolam Renang</span></div></div>
+                                        <div class="slide"><div class="slide-content"><i class="fas fa-bed"></i><span>Bilik Utama</span></div></div>
+                                    </div>
+                                    <button class="slider-btn prev" data-slider="1"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="slider-btn next" data-slider="1"><i class="fas fa-chevron-right"></i></button>
+                                    <div class="slider-dots" id="dots1"></div>
+                                </div>
+
+                                <p><strong>🏠 Deskripsi:</strong> Homestay tepi pantai dengan kolam renang peribadi dan dapur lengkap. Sesuai untuk keluarga atau kumpulan kecil.</p>
+
+                                <div class="quick-facts">
+                                    <span><i class="fas fa-clock"></i> Check-in 2PM</span>
+                                    <span><i class="fas fa-clock"></i> Check-out 12PM</span>
+                                    <span><i class="fas fa-map-pin"></i> 1.5km ke pusat bandar</span>
+                                    <span><i class="fas fa-plane"></i> Airport transfer percuma</span>
+                                </div>
+
+                                <p><strong>✨ Kemudahan Utama</strong></p>
+                                <div class="amenities-grid">
+                                    <span><i class="fas fa-wifi"></i> Wi-Fi percuma</span>
+                                    <span><i class="fas fa-parking"></i> Tempat letak kereta</span>
+                                    <span><i class="fas fa-concierge-bell"></i> Front desk 24 jam</span>
+                                    <span><i class="fas fa-utensils"></i> Restoran</span>
+                                    <span><i class="fas fa-cocktail"></i> Bar</span>
+                                    <span><i class="fas fa-shuttle-van"></i> Shuttle airport</span>
+                                    <span><i class="fas fa-suitcase"></i> Stor bagasi</span>
+                                    <span><i class="fas fa-balcony"></i> Balkoni/teres</span>
+                                </div>
+
+                                <p><strong>🗣️ Bahasa</strong></p>
+                                <div class="lang-list">
+                                    <span>English</span>
+                                    <span>Bahasa Melayu</span>
+                                    <span>Chinese (Mandarin)</span>
+                                </div>
+
+                                <p><strong>📋 Polisi</strong></p>
+                                <div class="policy-text">
+                                    • Shuttle percuma ke pusat bandar, lapangan terbang & feri (tertakluk kepada ketersediaan).<br>
+                                    • Daftar masuk sehingga 10:00 PM. Sila hubungi jika lewat.
+                                </div>
+
+                                <a href="#" class="contact-link" onclick="showToast('📞 Hubungi kami di +60 12-345 6789', 'fa-phone', '#2563eb'); return false;">
+                                    <i class="fas fa-phone-alt"></i> Contact property
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="price-row">
+                            <div class="price">RM350 <small>/ night</small></div>
+                            <button class="book-btn" data-id="1"><i class="fas fa-calendar-alt"></i> Book Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== PROPERTY 2 ===== -->
+                <div class="property-card" data-category="village" data-name="Rumah Desa">
+                    <div class="property-image" style="background: linear-gradient(135deg, #a7f3d0, #6ee7b7);">
+                        <span class="badge new">🌿 New</span>
+                        <button class="fav-btn" data-id="2"><i class="far fa-heart"></i></button>
+                        <div class="image-placeholder"><i class="fas fa-tree"></i></div>
+                    </div>
+                    <div class="property-details">
+                        <div class="title-row">
+                            <h4>Rumah Desa Homestay</h4>
+                            <div class="rating"><i class="fas fa-star"></i> 4.8</div>
+                        </div>
+                        <div class="location">
+                            <i class="fas fa-map-pin"></i> Jalan Tanjung Purun, WP Labuan
+                        </div>
+                        <div class="features">
+                            <span><i class="fas fa-bed"></i> 4 Bed</span>
+                            <span><i class="fas fa-bath"></i> 3 Bath</span>
+                            <span><i class="fas fa-user-friends"></i> 8 Guests</span>
+                        </div>
+
+                        <!-- MORE SECTION with Image Slider -->
+                        <div class="more-section">
+                            <button class="more-btn" data-target="desc2">
+                                <i class="fas fa-chevron-down"></i> More
+                            </button>
+                            <div id="desc2" class="extra-desc">
+                                <!-- IMAGE SLIDER -->
+                                <div class="image-slider" data-slider="2">
+                                    <div class="slider-track" id="sliderTrack2">
+                                        <div class="slide"><div class="slide-content"><i class="fas fa-tree"></i><span>Pemandangan Sawah</span></div></div>
+                                        <div class="slide"><div class="slide-content"><i class="fas fa-archway"></i><span>Beranda Luas</span></div></div>
+                                        <div class="slide"><div class="slide-content"><i class="fas fa-users"></i><span>Ruang Keluarga</span></div></div>
+                                    </div>
+                                    <button class="slider-btn prev" data-slider="2"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="slider-btn next" data-slider="2"><i class="fas fa-chevron-right"></i></button>
+                                    <div class="slider-dots" id="dots2"></div>
+                                </div>
+
+                                <p><strong>🏡 Deskripsi:</strong> Homestay kampung yang tenang dengan pemandangan sawah dan beranda luas. Sesuai untuk percutian santai bersama keluarga.</p>
+
+                                <div class="quick-facts">
+                                    <span><i class="fas fa-clock"></i> Check-in 3PM</span>
+                                    <span><i class="fas fa-clock"></i> Check-out 11AM</span>
+                                    <span><i class="fas fa-map-pin"></i> 3km ke pusat bandar</span>
+                                    <span><i class="fas fa-plane"></i> Airport transfer RM20</span>
+                                </div>
+
+                                <p><strong>✨ Kemudahan Utama</strong></p>
+                                <div class="amenities-grid">
+                                    <span><i class="fas fa-wifi"></i> Wi-Fi percuma</span>
+                                    <span><i class="fas fa-parking"></i> Tempat letak kereta</span>
+                                    <span><i class="fas fa-concierge-bell"></i> Front desk 24 jam</span>
+                                    <span><i class="fas fa-utensils"></i> Restoran</span>
+                                    <span><i class="fas fa-tree"></i> Taman</span>
+                                    <span><i class="fas fa-fire"></i> Kemudahan BBQ</span>
+                                    <span><i class="fas fa-tshirt"></i> Dobi</span>
+                                    <span><i class="fas fa-umbrella"></i> Teres</span>
+                                </div>
+
+                                <p><strong>🗣️ Bahasa</strong></p>
+                                <div class="lang-list">
+                                    <span>English</span>
+                                    <span>Bahasa Melayu</span>
+                                </div>
+
+                                <p><strong>📋 Polisi</strong></p>
+                                <div class="policy-text">
+                                    • Waktu senyap selepas 10:00 PM.<br>
+                                    • Haiwan peliharaan dibenarkan atas permintaan (tertakluk kepada terma).<br>
+                                    • Sarapan ringan disediakan setiap pagi (RM15/orang).
+                                </div>
+
+                                <a href="#" class="contact-link" onclick="showToast('📞 Hubungi kami di +60 12-345 6789', 'fa-phone', '#2563eb'); return false;">
+                                    <i class="fas fa-phone-alt"></i> Contact property
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="price-row">
+                            <div class="price">RM350 <small>/ night</small></div>
+                            <button class="book-btn" data-id="2"><i class="fas fa-calendar-alt"></i> Book Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- extra spacer -->
+                <div style="height: 4px;"></div>
+            </div>
+
+            <!-- ===== CALENDAR PAGE ===== -->
+            <div class="page" id="calendarPage">
+                <div class="calendar-header">
+                    <h3>Availability</h3>
+                    <div class="calendar-nav">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span id="calMonthYear" style="font-weight:600; font-size:18px; color:#0f172a;">January 2025</span>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- dynamically filled -->
+                </div>
+                <div class="calendar-legend">
+                    <span><span class="dot green"></span> Available</span>
+                    <span><span class="dot red"></span> Booked</span>
+                </div>
+                <p style="text-align:center; font-size:13px; color:#94a3b8; margin-top:16px;">
+                    <i class="fas fa-info-circle"></i> Tap a date to book (demo)
+                </p>
+            </div>
+
+        </div>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <div class="bottom-nav">
+            <button class="nav-item active" data-tab="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-tab="calendar">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Calendar</span>
+            </button>
+            <button class="nav-item" data-tab="saved">
+                <i class="far fa-heart"></i>
+                <span>Saved</span>
+                <span class="nav-badge">0</span>
+            </button>
+            <!-- Profile → About -->
+            <button class="nav-item" data-tab="about">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
+            </button>
+        </div>
+
+        <!-- ===== TOAST ===== -->
+        <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">Done!</span></div>
+
+        <!-- ===== ABOUT MODAL ===== -->
+        <div class="modal-overlay" id="aboutModal">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h4><i class="fas fa-info-circle" style="color:#2563eb;"></i> About KSKK Homestay</h4>
+                    <button class="close-btn" id="closeAbout">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>KSKK Homestay</strong> menawarkan penginapan selesa di Labuan dengan harga berpatutan.</p>
+                    <p>📍 Jalan Tanjung Purun, WP Labuan</p>
+                    <p>🏠 2 unit homestay eksklusif: <strong>Rumah Pantai</strong> (3 bilik) dan <strong>Rumah Desa</strong> (4 bilik).</p>
+                    <p>⭐ Kedua-dua unit mendapat rating 4.8+ daripada tetamu.</p>
+                    <p>📞 Hubungi: +60 12-345 6789</p>
+                    <p style="font-size:13px; color:#94a3b8; margin-top:12px;">&copy; 2025 KSKK Homestay. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BOOKING CALENDAR MODAL ===== -->
+        <div class="modal-overlay" id="bookingModal">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h4 id="bookingModalTitle">Book: Rumah Pantai</h4>
+                    <button class="close-btn" id="closeBooking">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span id="bookingMonthYear" style="font-weight:600; font-size:17px; color:#0f172a;">January 2025</span>
+                        <div>
+                            <button id="bookingPrevMonth" style="background:none; border:1px solid #e9edf4; border-radius:20px; padding:4px 12px; cursor:pointer;"><i class="fas fa-chevron-left"></i></button>
+                            <button id="bookingNextMonth" style="background:none; border:1px solid #e9edf4; border-radius:20px; padding:4px 12px; cursor:pointer;"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="bookingCalendarGrid">
+                        <!-- dynamically filled -->
+                    </div>
+                    <div class="calendar-legend">
+                        <span><span class="dot green"></span> Available</span>
+                        <span><span class="dot red"></span> Booked</span>
+                    </div>
+                    <p style="text-align:center; font-size:13px; color:#94a3b8; margin-top:12px;">
+                        <i class="fas fa-hand-pointer"></i> Klik tarikh untuk tempah (demo)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ── DOM refs ──
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            let toastTimer = null;
+
+            const searchInput = document.getElementById('searchInput');
+            const filterBtn = document.getElementById('filterBtn');
+            const seeAllLink = document.getElementById('seeAllLink');
+            const propertyCards = document.querySelectorAll('.property-card');
+            const favBtns = document.querySelectorAll('.fav-btn');
+            const bookBtns = document.querySelectorAll('.book-btn');
+            const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+            const navBadge = document.querySelector('.nav-badge');
+
+            // pages
+            const homePage = document.getElementById('homePage');
+            const calendarPage = document.getElementById('calendarPage');
+
+            // about modal
+            const aboutModal = document.getElementById('aboutModal');
+            const menuBtn = document.getElementById('menuBtn');
+            const closeAbout = document.getElementById('closeAbout');
+
+            // booking modal
+            const bookingModal = document.getElementById('bookingModal');
+            const closeBooking = document.getElementById('closeBooking');
+            const bookingModalTitle = document.getElementById('bookingModalTitle');
+            const bookingCalendarGrid = document.getElementById('bookingCalendarGrid');
+            const bookingMonthYear = document.getElementById('bookingMonthYear');
+            const bookingPrevMonth = document.getElementById('bookingPrevMonth');
+            const bookingNextMonth = document.getElementById('bookingNextMonth');
+
+            // MORE BUTTONS
+            const moreBtns = document.querySelectorAll('.more-btn');
+
+            // ── SLIDER LOGIC ──
+            function initSlider(sliderId) {
+                const slider = document.querySelector(`.image-slider[data-slider="${sliderId}"]`);
+                if (!slider) return;
+                const track = slider.querySelector('.slider-track');
+                const slides = track.querySelectorAll('.slide');
+                const prevBtn = slider.querySelector('.slider-btn.prev');
+                const nextBtn = slider.querySelector('.slider-btn.next');
+                const dotsContainer = slider.querySelector('.slider-dots');
+                let currentIndex = 0;
+                const total = slides.length;
+
+                // Create dots
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i < total; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'dot' + (i === 0 ? ' active' : '');
+                    dot.dataset.index = i;
+                    dot.addEventListener('click', function() {
+                        goTo(parseInt(this.dataset.index));
+                    });
+                    dotsContainer.appendChild(dot);
+                }
+
+                function goTo(index) {
+                    if (index < 0) index = total - 1;
+                    if (index >= total) index = 0;
+                    currentIndex = index;
+                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    // update dots
+                    dotsContainer.querySelectorAll('.dot').forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentIndex);
+                    });
+                }
+
+                prevBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    goTo(currentIndex - 1);
+                });
+                nextBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    goTo(currentIndex + 1);
+                });
+
+                // swipe support
+                let startX = 0;
+                let isDragging = false;
+                slider.addEventListener('touchstart', function(e) {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                }, { passive: true });
+                slider.addEventListener('touchmove', function(e) {
+                    if (!isDragging) return;
+                    const diff = startX - e.touches[0].clientX;
+                    if (diff > 40) { goTo(currentIndex + 1);
+                        isDragging = false; }
+                    if (diff < -40) { goTo(currentIndex - 1);
+                        isDragging = false; }
+                }, { passive: true });
+                slider.addEventListener('touchend', function() {
+                    isDragging = false;
+                }, { passive: true });
+
+                // store goTo on slider element for later use if needed
+                slider._goTo = goTo;
+                slider._currentIndex = currentIndex;
+            }
+
+            // ── Toast helper ──
+            window.showToast = function(msg, icon = 'fa-check-circle', color = '#34d399') {
+                if (toastTimer) clearTimeout(toastTimer);
+                toastMsg.textContent = msg;
+                toast.querySelector('i').className = `fas ${icon}`;
+                toast.querySelector('i').style.color = color;
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2400);
+            };
+
+            // ── More button toggle ──
+            moreBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const targetId = this.dataset.target;
+                    const desc = document.getElementById(targetId);
+                    if (!desc) return;
+
+                    const isOpen = desc.classList.contains('show');
+                    if (isOpen) {
+                        desc.classList.remove('show');
+                        this.classList.remove('active');
+                        this.innerHTML = '<i class="fas fa-chevron-down"></i> More';
+                    } else {
+                        desc.classList.add('show');
+                        this.classList.add('active');
+                        this.innerHTML = '<i class="fas fa-chevron-down"></i> Less';
+                        // init slider after desc opens
+                        const sliderId = this.closest('.property-card').querySelector('.image-slider')?.dataset
+                            .slider;
+                        if (sliderId) {
+                            setTimeout(() => initSlider(sliderId), 100);
+                        }
+                    }
+                });
+            });
+
+            // ── Favourite toggle ──
+            let savedCount = 0;
+            const savedSet = new Set();
+
+            favBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    const icon = this.querySelector('i');
+                    if (savedSet.has(id)) {
+                        savedSet.delete(id);
+                        icon.className = 'far fa-heart';
+                        this.classList.remove('saved');
+                        savedCount = Math.max(0, savedCount - 1);
+                        showToast('Removed from saved', 'fa-heart', '#94a3b8');
+                    } else {
+                        savedSet.add(id);
+                        icon.className = 'fas fa-heart';
+                        this.classList.add('saved');
+                        savedCount++;
+                        showToast('Added to saved! ❤️', 'fa-heart', '#ef4444');
+                    }
+                    navBadge.textContent = savedCount;
+                    navBadge.style.display = savedCount > 0 ? 'flex' : 'none';
+                });
+            });
+
+            // ── Book Now → open booking modal ──
+            bookBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    currentPropertyId = id;
+                    const name = this.closest('.property-card').querySelector('.title-row h4')
+                        .textContent.trim();
+                    bookingModalTitle.textContent = `Book: ${name}`;
+                    const now = new Date();
+                    bookingMonth = now.getMonth();
+                    bookingYear = now.getFullYear();
+                    renderBookingCalendar();
+                    bookingModal.classList.add('show');
+                });
+            });
+
+            // ── Close booking modal ──
+            closeBooking.addEventListener('click', function() {
+                bookingModal.classList.remove('show');
+            });
+            bookingModal.addEventListener('click', function(e) {
+                if (e.target === this) bookingModal.classList.remove('show');
+            });
+
+            // ── Booking calendar navigation ──
+            let bookingMonth = new Date().getMonth();
+            let bookingYear = new Date().getFullYear();
+            let currentPropertyId = 1;
+
+            const propertyBookings = {
+                1: ['2026-07-05', '2026-07-06', '2026-07-12', '2026-07-15', '2026-07-20', '2026-07-21',
+                    '2026-07-25', '2026-07-28'
+                ],
+                2: ['2026-07-03', '2026-07-04', '2026-07-10', '2026-07-11', '2026-07-18', '2026-07-19',
+                    '2026-07-26', '2026-07-27'
+                ]
+            };
+
+            bookingPrevMonth.addEventListener('click', function() {
+                if (bookingMonth === 0) { bookingMonth = 11;
+                    bookingYear--; } else { bookingMonth--; }
+                renderBookingCalendar();
+            });
+            bookingNextMonth.addEventListener('click', function() {
+                if (bookingMonth === 11) { bookingMonth = 0;
+                    bookingYear++; } else { bookingMonth++; }
+                renderBookingCalendar();
+            });
+
+            function renderBookingCalendar() {
+                const bookings = propertyBookings[currentPropertyId] || [];
+                const { days, monthName, year } = getMonthDays(bookingMonth, bookingYear, bookings);
+                bookingMonthYear.textContent = `${monthName} ${year}`;
+                bookingCalendarGrid.innerHTML = days;
+                bookingCalendarGrid.querySelectorAll('.day').forEach(dayEl => {
+                    if (dayEl.dataset.date && !dayEl.classList.contains('other-month')) {
+                        dayEl.style.cursor = 'pointer';
+                        dayEl.addEventListener('click', function() {
+                            const dateStr = this.dataset.date;
+                            const isBooked = this.classList.contains('booked');
+                            if (isBooked) {
+                                showToast('❌ Date already booked', 'fa-times-circle', '#ef4444');
+                            } else {
+                                showToast(`✅ Tentative booking for ${dateStr}`, 'fa-check-circle',
+                                    '#34d399');
+                            }
+                        });
+                    }
+                });
+            }
+
+            // ── Main calendar ──
+            let currentMonth = new Date().getMonth();
+            let currentYear = new Date().getFullYear();
+            const calGrid = document.getElementById('calendarGrid');
+            const calMonthYear = document.getElementById('calMonthYear');
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+
+            function getGlobalBookings() {
+                const all = [];
+                Object.values(propertyBookings).forEach(arr => {
+                    arr.forEach(d => { if (!all.includes(d)) all.push(d); });
+                });
+                return all;
+            }
+
+            function renderGlobalCalendar() {
+                const bookings = getGlobalBookings();
+                const { days, monthName, year } = getMonthDays(currentMonth, currentYear, bookings);
+                calMonthYear.textContent = `${monthName} ${year}`;
+                calGrid.innerHTML = days;
+                calGrid.querySelectorAll('.day').forEach(dayEl => {
+                    if (dayEl.dataset.date && !dayEl.classList.contains('other-month')) {
+                        dayEl.style.cursor = 'pointer';
+                        dayEl.addEventListener('click', function() {
+                            const dateStr = this.dataset.date;
+                            const isBooked = this.classList.contains('booked');
+                            if (isBooked) {
+                                showToast('❌ Not available', 'fa-times-circle', '#ef4444');
+                            } else {
+                                showToast(`✅ Available on ${dateStr}`, 'fa-check-circle', '#34d399');
+                            }
+                        });
+                    }
+                });
+            }
+
+            prevMonthBtn.addEventListener('click', function() {
+                if (currentMonth === 0) { currentMonth = 11;
+                    currentYear--; } else { currentMonth--; }
+                renderGlobalCalendar();
+            });
+            nextMonthBtn.addEventListener('click', function() {
+                if (currentMonth === 11) { currentMonth = 0;
+                    currentYear++; } else { currentMonth++; }
+                renderGlobalCalendar();
+            });
+
+            function getMonthDays(month, year, bookedDates) {
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const today = new Date();
+                const todayStr =
+                    `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+                let html = '';
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayNames.forEach(d => {
+                    html += `<div class="day-name">${d}</div>`;
+                });
+                for (let i = 0; i < firstDay; i++) {
+                    html += `<div class="day"></div>`;
+                }
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr =
+                        `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    const isBooked = bookedDates.includes(dateStr);
+                    let classes = 'day';
+                    if (isBooked) classes += ' booked';
+                    else classes += ' available';
+                    html += `<div class="${classes}" data-date="${dateStr}">${d}</div>`;
+                }
+                const totalCells = firstDay + daysInMonth;
+                const remainder = totalCells % 7;
+                if (remainder > 0) {
+                    for (let i = 0; i < 7 - remainder; i++) {
+                        html += `<div class="day other-month"></div>`;
+                    }
+                }
+                return { days: html, monthName: monthNames[month], year: year };
+            }
+
+            // ── Search filter ──
+            searchInput.addEventListener('input', function() {
+                const q = this.value.toLowerCase().trim();
+                propertyCards.forEach(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const match = name.includes(q);
+                    card.style.display = match ? 'block' : 'none';
+                });
+            });
+
+            // ── Filter button ──
+            filterBtn.addEventListener('click', function() {
+                showToast('🔍 Filter options coming soon!', 'fa-sliders-h', '#3b82f6');
+            });
+
+            // ── See all ──
+            seeAllLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                showToast('📋 Showing all homestays', 'fa-list-ul', '#2563eb');
+                propertyCards.forEach(c => c.style.display = 'block');
+                searchInput.value = '';
+            });
+
+            // ── Promo buttons ──
+            document.querySelectorAll('.promo-cta').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const promoId = this.dataset.promo;
+                    const offers = {
+                        '1': '🎉 20% OFF applied! (min 3 nights)',
+                        '2': '✅ Early Bird 15% OFF! (book 7 days ahead)',
+                        '3': '🏡 Stay 4, Pay 3! Free night added.'
+                    };
+                    showToast(offers[promoId] || 'Promo applied!', 'fa-gift', '#f59e0b');
+                });
+            });
+
+            // ── Bottom nav ──
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(n => n.classList.remove('active'));
+                    this.classList.add('active');
+                    const tab = this.dataset.tab;
+
+                    if (tab === 'home') {
+                        homePage.classList.add('active');
+                        calendarPage.classList.remove('active');
+                    } else if (tab === 'calendar') {
+                        homePage.classList.remove('active');
+                        calendarPage.classList.add('active');
+                        renderGlobalCalendar();
+                    } else if (tab === 'saved') {
+                        showToast(`❤️ Saved: ${savedCount} properties`, 'fa-heart', '#ef4444');
+                    } else if (tab === 'about') {
+                        // Show About modal
+                        aboutModal.classList.add('show');
+                    }
+                });
+            });
+
+            // ── About modal (from menu and bottom nav) ──
+            menuBtn.addEventListener('click', function() {
+                aboutModal.classList.add('show');
+            });
+            closeAbout.addEventListener('click', function() {
+                aboutModal.classList.remove('show');
+            });
+            aboutModal.addEventListener('click', function(e) {
+                if (e.target === this) aboutModal.classList.remove('show');
+            });
+
+            // ── Avatar click ──
+            document.querySelector('.avatar').addEventListener('click', function() {
+                showToast('👤 Guest Profile', 'fa-user', '#7c3aed');
+            });
+
+            // ── Notification bell ──
+            document.querySelector('.notif-badge').addEventListener('click', function() {
+                showToast('🔔 No new notifications', 'fa-bell', '#94a3b8');
+            });
+
+            // ── Initial render ──
+            renderGlobalCalendar();
+            navBadge.textContent = '0';
+            navBadge.style.display = 'none';
+
+            console.log('🏡 KSKK Homestay with About button!');
+        })();
+    </script>
+
+</body>
+</html>
