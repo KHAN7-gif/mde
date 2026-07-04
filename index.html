@@ -124,6 +124,13 @@
   .duel .ds{font-family:var(--mono);font-weight:800;font-size:14px;min-width:54px;text-align:center}
 
   /* admin */
+  .motm-strip{display:flex;align-items:center;gap:7px;padding:8px 14px;font-size:12.5px;color:var(--txt);background:var(--mint-soft);border-top:1px solid var(--line)}
+  .motm-strip span{font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-size:10px;color:var(--mint);font-weight:700}
+  .motm-n{font-family:var(--mono);font-weight:800;font-size:14px;color:var(--mint);white-space:nowrap;margin-left:auto}
+  .motm-pick{display:flex;flex-wrap:wrap;gap:7px}
+  .star-btn{font-family:var(--body);font-weight:600;font-size:12.5px;color:var(--muted);background:var(--panel);border:1px solid var(--line-2);border-radius:9px;padding:8px 11px;cursor:pointer;transition:.15s}
+  .star-btn.on{color:#fff;background:var(--mint);border-color:var(--mint)}
+  .kcol.kround.in .km.tp .kbox::before{display:none}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(24,16,32,.04),0 10px 26px rgba(24,16,32,.04)}
   .panel h2{font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-size:15px;font-weight:600;margin-bottom:4px}
   .panel p.hint{color:var(--muted);font-size:12.5px;margin-bottom:14px}
@@ -238,6 +245,7 @@
   <nav class="tabs" id="tabs">
     <button data-tab="teams" class="active">Pasukan</button>
     <button data-tab="players">Pemain</button>
+    <button data-tab="motm">MOTM</button>
     <button data-tab="fixtures">Perlawanan</button>
     <button data-tab="bracket">Kalah Mati</button>
   </nav>
@@ -245,6 +253,7 @@
   <div class="wrap">
     <section id="tab-teams"></section>
     <section id="tab-players" hidden></section>
+    <section id="tab-motm" hidden></section>
     <section id="tab-fixtures" hidden></section>
     <section id="tab-bracket" hidden></section>
     <section id="tab-admin" hidden></section>
@@ -412,6 +421,29 @@ function renderPlayers(){
   $('#tab-players').innerHTML=h;
   $('#tab-players').querySelectorAll('[data-pf]').forEach(b=>b.onclick=()=>{pFilter=b.dataset.pf;renderPlayers();});
 }
+function motmBoard(){
+  const cnt={};
+  const add=pid=>{ if(!pid)return; cnt[pid]=(cnt[pid]||0)+1; };
+  T.fixtures.forEach(f=>add(f.motm));
+  (T.ko||[]).forEach(m=>add(m.motm));
+  return Object.keys(cnt).map(pid=>({pid,name:PIDX[pid]?PIDX[pid].name:pid,tid:PIDX[pid]?PIDX[pid].tid:null,n:cnt[pid]}))
+    .sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name));
+}
+function renderMOTM(){
+  const rows=motmBoard();
+  let h=compHeader();
+  h+=`<div class="gcard"><div class="ghead"><h3>⭐ Pemain Terbaik · MOTM</h3>
+    <div class="cols"><span class="pts">⭐</span></div></div>`;
+  if(!rows.length)h+=`<div class="empty">Belum ada MOTM diberi. Admin boleh tekan ⭐ pada setiap perlawanan (tab Admin → Perlawanan).</div>`;
+  rows.forEach((r,i)=>{ const tm=team(r.tid);
+    h+=`<div class="srow"><span class="pos">${i+1}</span>${pava(r.pid)}
+      <span class="tn">${esc(r.name)}<span class="sub2"> · ${flagImg(tm)}${tm&&tm.logo?`<span class="tlogo" style="background-image:url('${imgSrc(tm.logo)}')"></span>`:''}${tm?esc(tm.short):''}</span></span>
+      <span class="motm-n">⭐ ${r.n}</span></div>`;
+  });
+  h+=`</div>`;
+  if(rows.length)h+=`<div style="font-size:11.5px;color:var(--muted);margin:4px 2px">Bilangan anugerah pemain terbaik perlawanan (Man of the Match).</div>`;
+  $('#tab-motm').innerHTML=h;
+}
 function renderFixtures(){
   const f=[['all','Semua'],['ft','Selesai'],['sched','Akan Datang']];
   let h=`<div class="chips">`+f.map(c=>`<button class="chip${fFilter===c[0]?' active':''}" data-ff="${c[0]}">${c[1]}</button>`).join('')+`</div>`;
@@ -432,7 +464,7 @@ function fixCard(fx){
     <div class="fx-mid">${done?`<span class="fx-agg"><span class="${hw>aw?'':'v'}">${hw}</span> <span class="v">-</span> <span class="${aw>hw?'':'v'}">${aw}</span></span>`:`<span class="fx-vs">vs</span>`}
       <span class="fx-st ${fx.status}">${done?'Selesai':'Akan Datang'}</span></div>
     <div class="fx-side away">${tbadge(A)}<span class="nm">${esc(A.name)}</span></div>
-  </button><div class="fx-duels" id="duels-${fx.id}" hidden>`;
+  </button>${fx.motm?`<div class="motm-strip">⭐ <span>MOTM</span> ${pmini(fx.motm)}<b>${esc(pName(fx.motm))}</b></div>`:''}<div class="fx-duels" id="duels-${fx.id}" hidden>`;
   fx.duels.forEach(d=>{
     const hn=(d.h||[]).map(pName).join(' / ')||'—', an=(d.a||[]).map(pName).join(' / ')||'—';
     const hwin=d.hs!=null&&d.hs>d.as, awin=d.as!=null&&d.as>d.hs;
@@ -467,13 +499,24 @@ function generateKO(){
     const ord=seedOrder(size);
     frMatches.forEach((m,i)=>{ m.top=winners[ord[i*2]-1]||'TBD'; m.bot=winners[ord[i*2+1]-1]||'TBD'; });
   }
-  T.ko=ko; propagateKO();
+  T.ko=ko;
+  if(size>=4 && T.thirdMode && T.thirdMode!=='none')
+    ko.push({id:'TP_0',round:'TP',top:'TBD',bot:'TBD',ts:null,bs:null,status:'sched',next:null,slot:null,motm:null});
+  propagateKO();
 }
 function propagateKO(){
   if(!T.ko)return; const by={}; T.ko.forEach(m=>by[m.id]=m);
   const targets=new Set(T.ko.filter(m=>m.next).map(m=>m.next));
   T.ko.forEach(m=>{ if(targets.has(m.id)){ m.top='TBD'; m.bot='TBD'; } });
   T.ko.forEach(m=>{ if(m.status==='ft'&&m.ts!=null&&m.bs!=null&&m.next&&m.ts!==m.bs){ const w=m.ts>m.bs?m.top:m.bot; const nm=by[m.next]; if(nm)nm[m.slot]=w; } });
+  if(T.thirdMode&&T.thirdMode!=='none'){
+    const tp=by['TP_0'], sfs=T.ko.filter(m=>m.round==='SF');
+    if(tp&&sfs.length===2){
+      sfs.forEach((m,i)=>{ const slot=i===0?'top':'bot';
+        if(m.status==='ft'&&m.ts!=null&&m.bs!=null&&m.ts!==m.bs) tp[slot]=(m.ts>m.bs?m.bot:m.top);
+        else tp[slot]='TBD'; });
+    }
+  }
 }
 function koRounds(){ const out=[]; KORDER.forEach(r=>{ if(T.ko&&T.ko.some(m=>m.round===r))out.push(r); }); return out; }
 
@@ -490,6 +533,8 @@ function koCol(round,cls){
   T.ko.filter(m=>m.round===round).forEach(m=>{
     h+=`<div class="km">${round==='F'?`<div class="klabel">🏆 Final</div>`:''}${koBox(m)}</div>`;
   });
+  if(round==='F'){ const tp=(T.ko||[]).find(m=>m.round==='TP');
+    if(tp)h+=`<div class="km tp"><div class="klabel">🥉 Tempat Ke-3${T.thirdMode==='joint'?' (Bersama)':''}</div>${koBox(tp)}</div>`; }
   return h+`</div>`;
 }
 function renderBracket(){
@@ -592,7 +637,7 @@ function admFixtures(){
 function admDuelEditor(fx){
   const H=team(fx.home),A=team(fx.away);
   const optFor=(tm,sel)=>`<option value="">—</option>`+tm.players.map(p=>`<option value="${p.id}"${sel===p.id?' selected':''}>${esc(p.name)}</option>`).join('');
-  let h=`<div style="background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:6px 0 12px">
+  let h=`<div id="fxed-${fx.id}" style="background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:6px 0 12px">
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px">${esc(H.short)} (kiri) · skor · ${esc(A.short)} (kanan)</div>`;
   fx.duels.forEach((d,i)=>{
     const np=Math.max(1,(d.h||[]).length, pps());
@@ -606,6 +651,11 @@ function admDuelEditor(fx){
       <div class="sc"><input type="number" min="0" data-d="${i}" data-f="hs" value="${d.hs??''}"><span>-</span><input type="number" min="0" data-d="${i}" data-f="as" value="${d.as??''}"></div>
       ${as_}</div>`;
   });
+  const parts=[]; fx.duels.forEach(d=>{(d.h||[]).forEach(p=>p&&parts.push(p));(d.a||[]).forEach(p=>p&&parts.push(p));});
+  const uniq=[...new Set(parts)];
+  h+=`<div class="field" style="margin-top:12px"><label>⭐ MOTM — Pemain terbaik perlawanan</label>
+    <div class="motm-pick">`+uniq.map(pid=>`<button type="button" class="star-btn${fx.motm===pid?' on':''}" data-motm="${pid}">★ ${esc(pName(pid))}</button>`).join('')+
+    `<button type="button" class="star-btn${!fx.motm?' on':''}" data-motm="">✕ Tiada</button></div></div>`;
   h+=`<div class="field" style="margin-top:12px"><label>Status</label><select id="fxStatus">
       <option value="sched"${fx.status==='sched'?' selected':''}>Akan Datang</option>
       <option value="live"${fx.status==='live'?' selected':''}>Sedang</option>
@@ -628,10 +678,13 @@ function bindFixtures(){
   };
   c.querySelectorAll('[data-edfx]').forEach(b=>b.onclick=()=>{edFix=edFix===b.dataset.edfx?null:b.dataset.edfx;renderAdmin();});
   c.querySelectorAll('[data-delfx]').forEach(b=>b.onclick=async()=>{ if(!confirm('Padam perlawanan ini?'))return; T.fixtures=T.fixtures.filter(f=>f.id!==b.dataset.delfx); if(edFix===b.dataset.delfx)edFix=null; await save(); renderAdmin(); renderPublic(); toast('Dipadam'); });
+  c.querySelectorAll('.motm-pick .star-btn').forEach(b=>b.onclick=()=>{ b.parentElement.querySelectorAll('.star-btn').forEach(x=>x.classList.remove('on')); b.classList.add('on'); });
   c.querySelectorAll('[data-savefx]').forEach(b=>b.onclick=async()=>{
     const fx=T.fixtures.find(f=>f.id===b.dataset.savefx); if(!fx)return;
-    c.querySelectorAll('.duel-ed select').forEach(sel=>{ const di=+sel.dataset.d,k=+sel.dataset.k,side=sel.dataset.side; (fx.duels[di][side])[k]=sel.value||null; });
-    c.querySelectorAll('.duel-ed input').forEach(inp=>{ const di=+inp.dataset.d,f=inp.dataset.f; fx.duels[di][f]=inp.value===''?null:+inp.value; });
+    const ed=$('#fxed-'+fx.id);
+    ed.querySelectorAll('.duel-ed select').forEach(sel=>{ const di=+sel.dataset.d,k=+sel.dataset.k,side=sel.dataset.side; (fx.duels[di][side])[k]=sel.value||null; });
+    ed.querySelectorAll('.duel-ed input').forEach(inp=>{ const di=+inp.dataset.d,f=inp.dataset.f; fx.duels[di][f]=inp.value===''?null:+inp.value; });
+    const on=ed.querySelector('.motm-pick .star-btn.on'); fx.motm=on?(on.dataset.motm||null):null;
     fx.status=$('#fxStatus').value;
     await save(); renderPublic(); renderAdmin(); toast('Keputusan disimpan');
   });
@@ -692,45 +745,57 @@ function bindTeams(){
 }
 
 /* --- admin: knockout --- */
+function koMatchEd(m){
+  const playable=team(m.top)&&team(m.bot);
+  const tn1=team(m.top)?team(m.top).short:m.top, tn2=team(m.bot)?team(m.bot).short:m.bot;
+  let motmOpts=`<option value="">⭐ MOTM —</option>`;
+  if(playable)[team(m.top),team(m.bot)].forEach(tm=>tm.players.forEach(p=>{ motmOpts+=`<option value="${p.id}"${m.motm===p.id?' selected':''}>${esc(p.name)} (${esc(tm.short)})</option>`; }));
+  return `<div class="duel-ed" data-ko="${m.id}">
+    <div class="lbl" style="font-size:13px;font-weight:700">${esc(tn1)}</div>
+    <div class="sc"><input type="number" min="0" class="kts" value="${m.ts??''}" ${playable?'':'disabled'}><span>-</span><input type="number" min="0" class="kbs" value="${m.bs??''}" ${playable?'':'disabled'}></div>
+    <div class="lbl" style="font-size:13px;font-weight:700;text-align:right">${esc(tn2)}</div>
+    <select class="kst" style="grid-column:1/-1;margin-top:5px" ${playable?'':'disabled'}>
+      <option value="sched"${m.status==='sched'?' selected':''}>Akan Datang</option>
+      <option value="ft"${m.status==='ft'?' selected':''}>Selesai</option></select>
+    <select class="kmotm" style="grid-column:1/-1;margin-top:5px" ${playable?'':'disabled'}>${motmOpts}</select></div>`;
+}
 function admKO(){
-  const G=groupList().length, per=T.koPerGroup||2, size=G*per, ok=[2,4,8,16,32].includes(size);
+  const G=groupList().length, per=T.koPerGroup||2, size=G*per, ok=[2,4,8,16,32].includes(size), tm3=T.thirdMode||'none';
   let h=`<div class="panel"><h2>Peringkat kalah mati</h2><p class="hint">Pasukan teratas setiap kumpulan layak. Jana bracket (silang juara lawan naib juara kumpulan lain), kemudian masukkan keputusan setiap pusingan. Pemenang naik automatik.</p>
     <div class="field"><label>Layak setiap kumpulan</label><select id="koPerSel">
       <option value="1"${per===1?' selected':''}>Juara sahaja (1)</option>
       <option value="2"${per===2?' selected':''}>Juara + naib (2)</option></select></div>
+    <div class="field"><label>Tempat ke-3 & ke-4</label><select id="thirdSel">
+      <option value="none"${tm3==='none'?' selected':''}>Tiada</option>
+      <option value="match"${tm3==='match'?' selected':''}>Perlawanan tempat ke-3 & ke-4</option>
+      <option value="joint"${tm3==='joint'?' selected':''}>Tempat ke-3 bersama (2 pasukan kalah SF)</option></select></div>
     <p class="hint">${G} kumpulan × ${per} = <b style="color:${ok?'var(--mint)':'#ff6b6b'}">${size} pasukan</b> dalam bracket${ok?'':' — perlu jumlah 2/4/8/16/32. Laraskan bilangan kumpulan di Tetapan.'}</p>
     <button class="btn" id="koGen"${ok?'':' disabled'}>Jana bracket dari kumpulan</button>
     ${T.ko&&T.ko.length?'<p class="hint" style="margin:10px 0 0">Jana semula akan tetapkan peserta ikut kedudukan kumpulan terkini & padam keputusan kalah mati.</p>':''}</div>`;
   if(T.ko&&T.ko.length){
     koRounds().forEach(r=>{
       h+=`<div class="panel"><h2>${KOLABEL[r]}</h2>`;
-      T.ko.filter(m=>m.round===r).forEach(m=>{
-        const playable=team(m.top)&&team(m.bot);
-        const tn1=team(m.top)?team(m.top).short:m.top, tn2=team(m.bot)?team(m.bot).short:m.bot;
-        h+=`<div class="duel-ed" data-ko="${m.id}">
-          <div class="lbl" style="font-size:13px;font-weight:700">${esc(tn1)}</div>
-          <div class="sc"><input type="number" min="0" class="kts" value="${m.ts??''}" ${playable?'':'disabled'}><span>-</span><input type="number" min="0" class="kbs" value="${m.bs??''}" ${playable?'':'disabled'}></div>
-          <div class="lbl" style="font-size:13px;font-weight:700;text-align:right">${esc(tn2)}</div>
-          <select class="kst" style="grid-column:1/-1;margin-top:5px" ${playable?'':'disabled'}>
-            <option value="sched"${m.status==='sched'?' selected':''}>Akan Datang</option>
-            <option value="ft"${m.status==='ft'?' selected':''}>Selesai</option></select></div>`;
-      });
+      T.ko.filter(m=>m.round===r).forEach(m=>{ h+=koMatchEd(m); });
       h+=`</div>`;
     });
+    const tp=T.ko.find(m=>m.round==='TP');
+    if(tp&&tm3==='match'){ h+=`<div class="panel"><h2>🥉 Tempat Ke-3 & Ke-4</h2>${koMatchEd(tp)}</div>`; }
+    else if(tp&&tm3==='joint'){ const a=team(tp.top),b=team(tp.bot); h+=`<div class="panel"><h2>🥉 Tempat Ke-3 (Bersama)</h2><p class="hint">Kedua-dua pasukan kalah separuh akhir berkongsi tempat ke-3: <b>${a?esc(a.short):'TBD'}</b> & <b>${b?esc(b.short):'TBD'}</b>.</p></div>`; }
     h+=`<button class="btn" id="koSave" style="margin-bottom:14px">Simpan keputusan kalah mati</button>`;
   }
   return h;
 }
 function bindKO(){
   const c=$('#tab-admin');
-  $('#koGen').onclick=async()=>{ T.koPerGroup=parseInt($('#koPerSel').value)||2; generateKO();
+  $('#koGen').onclick=async()=>{ T.koPerGroup=parseInt($('#koPerSel').value)||2; T.thirdMode=$('#thirdSel')?$('#thirdSel').value:'none'; generateKO();
     if(!T.ko.length){toast('Jumlah pasukan mesti 2/4/8/16/32',1);return;}
     await save(); renderBracket(); renderTeams(); renderAdmin(); toast('Bracket dijana'); };
   if($('#koSave'))$('#koSave').onclick=async()=>{
     c.querySelectorAll('.duel-ed[data-ko]').forEach(row=>{ const m=T.ko.find(x=>x.id===row.dataset.ko); if(!m)return;
       const ts=row.querySelector('.kts').value, bs=row.querySelector('.kbs').value;
-      m.ts=ts===''?null:+ts; m.bs=bs===''?null:+bs; m.status=row.querySelector('.kst').value; });
-    propagateKO(); await save(); renderBracket(); renderAdmin(); toast('Keputusan disimpan');
+      m.ts=ts===''?null:+ts; m.bs=bs===''?null:+bs; m.status=row.querySelector('.kst').value;
+      const mo=row.querySelector('.kmotm'); if(mo)m.motm=mo.value||null; });
+    propagateKO(); await save(); renderBracket(); renderMOTM(); renderAdmin(); toast('Keputusan disimpan');
   };
 }
 
@@ -782,10 +847,10 @@ function bindSettings(){
 /* ---------- shell ---------- */
 async function save(){ await Store.set(KEY,T); }
 function applyBrand(){ $('#brandName').textContent=T.name; $('#brandSub').textContent=T.sub||''; document.title=T.name; }
-function renderPublic(){ renderTeams(); renderPlayers(); renderFixtures(); renderBracket(); }
+function renderPublic(){ renderTeams(); renderPlayers(); renderMOTM(); renderFixtures(); renderBracket(); }
 function switchTab(name){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
-  ['teams','players','fixtures','bracket','admin'].forEach(t=>$('#tab-'+t).hidden=(t!==name));
+  ['teams','players','motm','fixtures','bracket','admin'].forEach(t=>$('#tab-'+t).hidden=(t!==name));
   if(name==='bracket')renderBracket();
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -798,6 +863,7 @@ function init(){
   if(!T){ T=seed(); }
   if(!T.teams||!T.fixtures){ T=seed(); }
   if(!T.numGroups)T.numGroups=groupList().length||1;
+  if(!T.thirdMode)T.thirdMode='none';
   refreshIdx();
   if(!T.ko||!T.ko.length){ generateKO(); }
   await save();
